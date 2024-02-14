@@ -305,6 +305,11 @@ def main():
         default=None,
         help="List of files with line ranges to filter the warnings.",
     )
+    parser.add_argument(
+        "-exclude-path",
+        default=None,
+        help="Directory to exclude running clang-tidy.",
+    )
     if yaml:
         parser.add_argument(
             "-export-fixes",
@@ -494,7 +499,7 @@ def main():
 
         # Fill the queue with files.
         for name in files:
-            if file_name_re.search(name):
+            if file_name_re.search(name) and not args.exclude_path in name:
                 task_queue.put(name)
 
         # Wait for all threads to be done.
