@@ -92,6 +92,7 @@ def make_absolute(f, directory):
 def get_tidy_invocation(
     f,
     clang_tidy_binary,
+    clang_tidy_cache_script,
     checks,
     tmpdir,
     build_path,
@@ -108,7 +109,7 @@ def get_tidy_invocation(
     warnings_as_errors,
 ):
     """Gets a command line for clang-tidy."""
-    start = [clang_tidy_binary]
+    start = ["python", clang_tidy_cache_script, clang_tidy_binary]
     if allow_enabling_alpha_checkers:
         start.append("-allow-enabling-analyzer-alpha-checkers")
     if header_filter is not None:
@@ -214,6 +215,7 @@ def run_tidy(args, clang_tidy_binary, tmpdir, build_path, queue, lock, failed_fi
         invocation = get_tidy_invocation(
             name,
             clang_tidy_binary,
+            args.clang_tidy_cache_script,
             args.checks,
             tmpdir,
             build_path,
@@ -261,6 +263,10 @@ def main():
     )
     parser.add_argument(
         "-clang-tidy-binary", metavar="PATH", help="path to clang-tidy binary"
+    )
+    parser.add_argument(
+        "-clang-tidy-cache-script",
+        help="path to clang-tidy-cache script"
     )
     parser.add_argument(
         "-clang-apply-replacements-binary",
@@ -434,6 +440,7 @@ def main():
         invocation = get_tidy_invocation(
             "",
             clang_tidy_binary,
+            args.clang_tidy_cache_script,
             args.checks,
             None,
             build_path,
